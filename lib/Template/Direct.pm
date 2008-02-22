@@ -23,12 +23,12 @@ Template::Direct - Creates a document page based on template/datasets
 
 =cut
 
-use Directory;
 use Carp;
 use Template::Direct::Page;
 use Template::Direct::Data;
+use Template::Direct::Directory;
 
-our $VERSION = "1.12";
+our $VERSION = '1.13';
 our $config;
 
 =head2 I<$class>->new( %properties )
@@ -50,7 +50,7 @@ sub new
 	if(ref($p{'Directory'}) eq 'Directory') {
 		$self->{'Dir'} = $p{'Directory'};
 	} else {
-		$self->{'Dir'} = Directory->new( $p{'Directory'} );
+		$self->{'Dir'} = Template::Direct::Directory->new( $p{'Directory'} );
 	}
 
 	if(not $self->{'Dir'}) {
@@ -137,7 +137,7 @@ sub _suitableLanguage
 
 =head1 AUTHOR
 
- Copyright, Martin Owens 2008, GPLv3
+ Copyright, Martin Owens 2008, AGPL
 
 =cut
 1;

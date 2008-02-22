@@ -10,6 +10,8 @@ lib/Template/Direct/Page.pm
 lib/Template/Direct/Data.pm
 lib/Template/Direct/List.pm
 lib/Template/Direct/SubPage.pm
+lib/Template/Direct/Directory.pm
+lib/Template/Direct/Directory/File.pm
 data/simple.html
 data/otherpage.html
 t/00-load.t

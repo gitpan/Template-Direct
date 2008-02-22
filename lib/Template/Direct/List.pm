@@ -229,7 +229,7 @@ sub getEntryContent {
 
 =head1 AUTHOR
 
-  Martin Owens - Copyright 2007, GPLv3
+  Martin Owens - Copyright 2007, AGPL
 
 =cut
 1;
