@@ -132,13 +132,13 @@ sub parseConditional
 			$current = $current->lastItem();
 		} elsif($raw =~ s/^\{//) {
 			# Static Array
-			my $array = [];
+			my $array = Template::Direct::Conditional::Array->new();
 			$current->append($array);
 			push @depths, $current if $current;
 			$current = $array;
 		}
 
-		if(ref($current) eq 'ARRAY') {
+		if(ref($current) eq 'Template::Direct::Conditional::Array') {
 			my $end = 1 if $raw =~ s/\}$//;
 			push @{$current}, $raw;
 			$current = pop @depths if $end and @depths;
@@ -154,6 +154,9 @@ sub parseConditional
 				# Get datum if required, replace this token with real value
 				if($sane =~ /^\$(.+)$/) {
 					$sane = $data->getDatum($1);
+				}
+				if(UNIVERSAL::isa($sane, 'ARRAY') and not UNIVERSAL::isa($sane, 'HASH')) {
+					$sane = Template::Direct::Conditional::Array->new( $sane );
 				}
 
 				# Push this token onto the current stack.
@@ -205,6 +208,7 @@ sub parseLogical
 package Template::Direct::Conditional::Tokens;
 
 use strict;
+use Carp;
 
 =head1 NAME
 
@@ -255,7 +259,7 @@ sub execute
 	my $o = shift @t;
 	warn "Operator not found in conditional: ".join(' ', @{$self})."\n" if not $o;
 	my $b = shift @t;
-	$b = not shift @t if $b and $b eq 'not';
+	$b = not shift(@t) if $b and $b eq 'not';
 
 	$a = $a->execute($cond) if ref($a) eq 'Template::Direct::Conditional::Tokens';
 	$b = $b->execute($cond) if ref($b) eq 'Template::Direct::Conditional::Tokens';
@@ -278,8 +282,14 @@ sub execute
 	unshift @t, ($a eq  $b) ? $true : $false if $o eq '=' or $o eq 'eq';
 	unshift @t, ($a ne  $b) ? $true : $false if $o eq '!=' or $o eq 'ne';
 
-	# Array Conditional (python kidnaped!)
-	unshift @t, $self->in($a, $b) ? $true : $false if $o eq 'in';
+	if($o eq "in") {
+		if(ref($b) eq "Template::Direct::Conditional::Array") {
+			# Array Conditional (python kidnaped!)
+			unshift @t, $b->in($a) ? $true : $false;
+		} else {
+			croak "Invalid array used in conditional $a in $b";
+		}
+	}
 
 	# Order of magnatude
 	unshift @t, (($a % $b) == 0) ? $true : $false if $o eq '@';
@@ -289,19 +299,6 @@ sub execute
 	} else {
 		Template::Direct::Conditional::Tokens->new(\@t)->execute() ? $true : $false;
 	}
-}
-
-=head2 I<$tokens>->in( $a, $b )
-
-  Returns true if $b (ARRAY REF) contains $a.
-
-=cut
-sub in {
-	my ($self, $a, $b) = @_;
-	for my $i (@{$b}) {
-		return 1 if $i eq $a;
-	}
-	return 0;
 }
 
 =head2 I<$tokens>->append( $item )
@@ -330,6 +327,62 @@ sub lastItem {
 
 =cut
 sub iterator { return @{$_[0]}; }
+
+
+
+package Template::Direct::Conditional::Array;
+
+use strict;
+use Carp;
+
+=head1 NAME
+
+Template::Direct::Conditional::Array - Handle arrays in conditionals
+
+=head1 METHODS
+
+=cut
+
+use overload
+	"''" => sub { shift->count() },
+	"eq" => sub { shift->count() eq shift },
+	"ne" => sub { shift->count() ne shift },
+	">"  => sub { shift->count() > shift },
+	"<"  => sub { shift->count() < shift },
+	"<=" => sub { shift->count() <= shift },
+	">=" => sub { shift->count() >= shift },
+	'bool' => sub { shift->count() > 0 },;
+
+=head2 I<$class>->new( $list )
+
+  Return an array object.
+
+=cut
+sub new {
+    my ($class, $list) = @_;
+    $list = [] if not defined $list;
+    return bless \@{$list}, $class;
+}
+
+=head2 I<$array>->in( $var )
+
+  Return true if var is in this array.
+
+=cut
+sub in {
+	my ($self, $var) = @_;
+    for my $i (@{$self}) {
+        return 1 if $i eq $var;
+    }
+    return 0;
+}
+
+=head1 OVERLOADED
+
+  All the kinds of overloading this object has on it.
+
+=cut
+sub count { scalar(@{ $_[0] }) }
 
 =head1 AUTHOR
 

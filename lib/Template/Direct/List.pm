@@ -102,6 +102,26 @@ sub compileListData {
 		if(UNIVERSAL::isa($list, 'ARRAY')) {
 			my $length = @{$list};
 			my $depth  = 0; # NERN
+
+			# Should we sort the data in some sort of order
+			if(my $sort = $self->{'options'}->{'sort'}) {
+				# We only support 'name' and 'value' for now
+				# But there is scope to improve this functionality.
+				if($sort eq '1') {
+					if($self->{'options'}->{'numericalSort'}) {
+						$list = [ sort { $a <=> $b } @{$list} ];
+					} else {
+						$list = [ sort { $a cmp $b } @{$list} ];
+					}
+				} else {
+					# Loop through each and replace with hash (sorry)
+					foreach my $item (@{$list}) {
+						$item = $data->_makeHash( $item );
+					}
+					$list = [ sort { $a->{$sort} cmp $b->{$sort} } @{$list} ];
+				}
+			}    
+
 			#print "FOUND LIST $length long based on ".$self->{'listName'}." and $entry\n";
 			for(my $index = 0; $index < $length; $index++) {
 

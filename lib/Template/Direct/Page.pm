@@ -55,9 +55,10 @@ sub singleTag { 1 }
 =cut
 sub subTags {
 	{
-		'if'   => 'Template::Direct::Conditional',
-		'list' => 'Template::Direct::List',
-		'page' => 'Template::Direct::SubPage',
+		'if'    => 'Template::Direct::Conditional',
+		'list'  => 'Template::Direct::List',
+		'page'  => 'Template::Direct::SubPage',
+		'maths' => 'Template::Direct::Maths',
 	}
 }
 
@@ -184,14 +185,16 @@ sub markAllTags {
 				}
 
 			} else {
+				my $found = 0;
 				for(my $i=0;$i<=$#stack;$i++) {
 					if($stack[$#stack-$i]->hasTag( $name )) {
-						#print "Adding subtag $name to ".$stack[$#stack-$i]."\n";
 						$stack[$#stack-$i]->addSubTag( $name, $tagIndex, $data );
+						$found = 1;
 						last;
-					} elsif($i == $#stack) {
-						die "Unknown start tag, $name at $tagIndex; stopping\n";
 					}
+				}
+				if(not $found) {
+					die "Unknown tag: '$name' at $tagIndex; stopping\n";
 				}
 			}
 		} else {

@@ -1,6 +1,6 @@
-#!perl -T
+#!/usr/bin/perl
 
-use Test::More tests => 39;
+use Test::More tests => 49;
 use strict;
 
 BEGIN {
@@ -17,9 +17,9 @@ my $result = $document->compile(
 		Simple1 => 'foo',
 		Simple2 => 'bar',
 		hash    => {
+			B => '6',
+			C => '5',
 			A => '1',
-			B => '2',
-			C => '3',
 		},
 		array   => [ 'A', 'B', 'C' ],
 		array2  => [ [ 'A', 'B', 'C' ], [ 'D', 'E', 'F' ], [ 'G', 'H', 'I' ] ],
@@ -40,7 +40,9 @@ my $result = $document->compile(
 				{ name => 'Song' },
 			] },
 		],
+		array7 => [],
 		integer => 12,
+		number  => [ 4, 16, 2.2, 9.4, 2.4, 3.14159265 ],
 		struct1 => [
 			{ name => 'A',   value => '1' },
 			{ name => 'B',   value => '2', children => [
@@ -81,9 +83,10 @@ my %tests = (
 	s1 => 'Variables 1',
 	s2 => 'Variables 2',
 	h0 => 'Hash Listing',
-	h1 => 'Hash Variables 1',
-	h2 => 'Hash Variables 2',
-	h3 => 'Hash Listed Integer List',
+	h1 => 'Sorted Hash Listing',
+	h2 => 'Hash Variables 1',
+	h3 => 'Hash Variables 2',
+	h4 => 'Hash Listed Integer List',
 	l0 => 'Array Listing',
 	l1 => 'Array Variables 1',
 	l2 => 'Array Variables 2',
@@ -111,17 +114,27 @@ my %tests = (
 	o6 => 'Conditional in Static Array',
 	o7 => 'Conditional in Variable Array',
 	o8 => 'Not Conditional in Variable Array',
+    o9 => 'Array as conditional',
 	l6 => 'Arrays can exists after conditionals',
 	li => 'Lists within lists with the same values',
 	p1 => 'Included Page',
+	m1 => 'Simple Mathamatics',
+	m2 => 'Mathamatical Precidence',
+	m3 => 'Mathamatics with brackets',
+	m4 => 'Formated Printing of Numbers',
+	m5 => 'Data in calculations',
+	m6 => 'Complex Mathamatical Precidence',
+	m7 => 'Powers and Remainders',
+	sort1 => 'Numericaly Sorted List Items',
 );
 my %expected = (
 	s1 => 'foo',
 	s2 => 'bar',
-	h0 => 'A=1, C=3, B=2',
-	h1 => '1',
-	h2 => '2',
-	h3 => 'A=1; C=1, 2, 3; B=1, 2',
+	h0 => 'A=1, B=6, C=5',
+	h1 => 'A=1, C=5, B=6',
+	h2 => '1',
+	h3 => '6',
+	h4 => 'A=1; B=1, 2, 3, 4, 5, 6; C=1, 2, 3, 4, 5',
 	l0 => 'A, B, C',
 	l1 => 'A',
 	l2 => 'B',
@@ -132,7 +145,7 @@ my %expected = (
 	nl1 => 'TRUE',
 	i0 => '1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12',
 	i1 => '12',
-	i2 => '1, 2',
+	i2 => '1, 2, 3, 4, 5, 6',
 	i3 => '1, 2, 3, 4',
 	c1 => '-A=1, C=, B=2, -',
 	e1 => 'A:1,B:2(BA:21,BB:22),C:3(CA:31,CB:32,CC:33(CCA:331,CCB:332))',
@@ -149,9 +162,18 @@ my %expected = (
 	o6 => 'True',
 	o7 => 'True',
 	o8 => 'True',
+	o9 => 'False',
 	l6 => 'A, B, C',
 	li => 'One=[A, Uno, Ngang], Two=[B, Duo, Song]',
-	p1 => '*A=1, C=3, B=2*',
+	p1 => '*A=1, C=5, B=6*',
+	m1 => '4',
+	m2 => '22',
+	m3 => '18',
+	m4 => '0.67',
+	m5 => '4.36',
+	m6 => '3.5',
+	m7 => '50',
+	sort1 => '2.2, 2.4, 3.14159265, 4, 9.4, 16',
 );
 
 my $a = is(ref($document), 'Template::Direct', 'Document object creation');

@@ -1,9 +1,10 @@
 s1:$Simple1
 s2:$Simple2
-h0:[list hash][entry]$name=$value[/entry][seperator], [/seperator][/list]
-h1:$hash_A
-h2:$hash_B
-h3:[list hash][entry]$name=[list value][entry]$value[/entry][seperator], [/seperator][/list][/entry][seperator]; [/seperator][/list]
+h0:[list hash sort="name"][entry]$name=$value[/entry][seperator], [/seperator][/list]
+h1:[list hash sort="value"][entry]$name=$value[/entry][seperator], [/seperator][/list]
+h2:$hash_A
+h3:$hash_B
+h4:[list hash sort="name"][entry]$name=[list value][entry]$value[/entry][seperator], [/seperator][/list][/entry][seperator]; [/seperator][/list]
 l0:[list array][entry]$value[/entry][seperator], [/seperator][/list]
 l1:$array_0
 l2:$array_1
@@ -31,6 +32,15 @@ o5:[if $integer][if $hash_A]True[else]False[/if][/if]
 o6:[if $hash_A in {1 2}]True[else]False[/if]
 o7:[if 'A' in $array]True[else]False[/if]
 o8:[if not 'Z' in $array]True[else]False[/if]
+o9:[if $array7]True[else]False[/if]
 l6:[list array][entry]$value[/entry][seperator], [/seperator][/list]
 li:[list array6][entry]$name=\[[list values][entry]$name[/entry][seperator], [/seperator][/list]\][/entry][seperator], [/seperator][/list]
 p1:*[page otherpage.html]*
+m1:[maths 2 + 2]
+m2:[maths 2 + 5 * 4]
+m3:[maths 3 * (4 + 2)]
+m4:[maths 2 / 3=%0.2f]
+m5:[maths $number_0 * $number_4 / $number_2=%0.2f]
+m6:[maths 2 + 3 - 4 * 3 / 8]
+m7:[maths 5 % 3 * 5 ^ 2]
+sort1:[list number sort numericalSort][entry]$value[/entry][seperator], [/seperator][/list]

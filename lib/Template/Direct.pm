@@ -28,7 +28,7 @@ use Template::Direct::Page;
 use Template::Direct::Data;
 use Template::Direct::Directory;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 our $config;
 
 =head2 I<$class>->new( %properties )

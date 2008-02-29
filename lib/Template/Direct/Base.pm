@@ -18,6 +18,7 @@ Template::Direct::Base - Basic class for content sections
 use Template::Direct::Conditional;
 use Template::Direct::List;
 use Template::Direct::SubPage;
+use Template::Direct::Maths;
 use Carp;
 
 =head2 I<$class>->new( $data )
@@ -252,9 +253,18 @@ sub getOptions {
 	my ($self, $opt) = @_;
 	my $results = {};
 
-	while($opt =~ s/(\w+)\=\"(.*?)(?<!\\)\"//) {
+	while($opt =~ s/(\w+)=["']([^"']*)(?<!\\)["']//) {
 		$results->{$1} = $2;
 	}
+
+	foreach my $o (split(/(?<!\\)\s+/, $opt)) {
+		if($o =~ /(\w+)=(.*)?/) {
+			$results->{$1} = $2;
+		} else {
+			$results->{$o} = 1;
+		}
+	}
+
 	return $results;
 }
 
