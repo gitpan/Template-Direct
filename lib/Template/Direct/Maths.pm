@@ -85,39 +85,42 @@ sub parseStatement {
 	my ($self, $s, $data) = @_;
 	my $statement = [];
 
-    #Split into raw tokens
-    my @raws = split(/\s+/, $s);
+	#Split into raw tokens
+	my @raws = split(/\s+/, $s);
 	my @depths;
 	my $current = $statement;
 
-    foreach my $raw (@raws) {
+	foreach my $raw (@raws) {
 
-        if($raw =~ s/^\(//) {
-            # New level
+		if($raw =~ s/^\(//) {
+			# New level
 			my $new = [];
-            push @{$current}, $new;
-            push @depths, $current if $current;
-            $current = $new;
-        }
+			push @{$current}, $new;
+			push @depths, $current if $current;
+			$current = $new;
+		}
 
 		my $end = $raw =~ s/\)$// ? 1 : 0;
 
 		if($raw ne '') {
-           # Add sane tokens only, remove all unexpected charicters.
-           my $sane = $raw;
-           #$sane =~ s/[^\w\$_\{\}\<\>\|\&\=\!\@]//g;
+			# Add sane tokens only, remove all unexpected charicters.
+			my $sane = $raw;
+			#$sane =~ s/[^\w\$_\{\}\<\>\|\&\=\!\@]//g;
 
-           # Get datum if required, replace this token with real value
-           if($sane =~ /^\$(.+)$/) {
-               $sane = $data->getDatum($1, forceString => 1);
-           }
+			# Get datum if required, replace this token with real value
+			if($sane =~ /^\$(.+)$/) {
+				$sane = $data->getDatum($1, forceString => 1);
+			}
 
-           # Push this token onto the current stack.
-           push @{$current}, $sane if defined($sane) and scalar($sane.'') ne '';
+			# Set 0 when required
+			$sane = 0 if not $sane;
+
+			# Push this token onto the current stack.
+			push @{$current}, $sane if defined($sane) and scalar($sane.'') ne '';
 		}
 
-        $current = pop @depths if $end and @depths;
-    }
+		$current = pop @depths if $end and @depths;
+	}
 
 	return $statement;
 }

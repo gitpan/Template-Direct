@@ -187,7 +187,7 @@ sub getDatum {
 =cut
 sub getArrayDatum {
 	my ($self, $name, %p) = @_;
-	return $self->_makeArray($name) if $name =~ /^\d+$/;
+	return $self->_makeArray($name) if $name =~ /^\-?\d+$/;
 	return $self->_makeArray($self->getDatum($name, %p));
 }
 
@@ -248,8 +248,13 @@ sub _getSubStructure {
 			last;
 		}
 
-		if($part =~ /^\d+$/) {
-			$pdata = $self->_makeArray($pdata)->[$part];
+		if($part =~ /^\-?\d+$/) {
+			if($part < 0) {
+				my $a = $self->_makeArray($pdata);
+				$pdata = $a->[@{$a}+$part];
+			} else {
+				$pdata = $self->_makeArray($pdata)->[$part];
+			}
 		} else {
 			$pdata = $self->_makeHash($pdata)->{$part};
 		}
